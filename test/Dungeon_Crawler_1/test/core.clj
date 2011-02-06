@@ -2,5 +2,27 @@
   (:use [Dungeon-Crawler-1.core] :reload)
   (:use [clojure.test]))
 
-(deftest replace-me ;; FIXME: write
-  (is false "No tests have been written."))
+(def testLocation (struct location "testName" "testDescription"))
+
+(def testPlayer (struct player "Jon" testLocation))
+
+(def testItem1 (struct item "item1" "item of power!"))
+(def testItem2 (struct item "item2" "item of current!"))
+(def testItem3 (struct item "item3" "item of resistance!"))
+
+(def testInventory (struct inventory "testInventory" '(testItem1 testItem2)))
+
+(deftest incr-works
+  (is (= 2 (incr 1))))
+
+(deftest jon-name-is-Jon
+  (is (= "Jon" (:name testPlayer))))
+
+(deftest jon-location-is-greatHall
+  (is (= testLocation (:location testPlayer))))
+
+(deftest mainHallDescription
+  (is (= "testDescription" (:description testLocation))))
+
+(deftest addItemsTest
+  (is (= '(testItem3 testItem1 testItem2) ((addItems testInventory 'testItem3) :items))))
