@@ -1,0 +1,16 @@
+(load-file "./state.clj")
+(refer 'Dungeon-Crawler-1.state)
+(load-file "./core.clj")
+(refer 'Dungeon-Crawler-1.core)
+
+(def flag true)
+(println "> ")
+(while flag
+  (def line (read-line))
+  ;(println (locationMap 'outside))
+  (println (locationMap ((first ((locationMap 'outside) :exits)) :location)))
+  (if (= line "lol") (println "no you!") ())
+  (if (= line "help") (println "RTFM noob!") ())
+  (if (= line "look") (println (currentRoom :description)))
+  (if (= line "north") (goNorth))
+)

@@ -13,9 +13,6 @@
 
 (def testPlayer (struct player "Jon" testLocation testInventory))
 
-(deftest incr-works
-  (is (= 2 (incr 1))))
-
 (deftest jon-name-is-Jon
   (is (= "Jon" (:name testPlayer))))
 
@@ -26,7 +23,7 @@
   (is (= "testDescription" (:description testLocation))))
 
 (deftest addItemsTest
-  (is (= '(testItem3 testItem1 testItem2) ((addItems testInventory 'testItem3) :items))))
+  (is (= '(testItem3 testItem1 testItem2) ((addItem testInventory 'testItem3) :items))))
 
 (deftest pickupItemTest
   (is (= '(testItem3 testItem1 testItem2) (((pickupItem testPlayer 'testItem3) :inventory) :items))))
