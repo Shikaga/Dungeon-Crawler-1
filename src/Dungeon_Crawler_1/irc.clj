@@ -41,10 +41,26 @@
        (re-find #".* PRIVMSG.*" msg)
        (let [[_ name _ _ message] (re-matches #":(.*)!(.*PRIVMSG )([A-Za-z0-9-]+) :(.*)" msg)]
 	 (do
-	   (addWorldPlayer (struct player name #{}))
-           (write conn (str "PRIVMSG " name " : Current Players: " (getWorldPlayers)))
-	 )
-       )))))
+	   (if (not (playerInGame? name))
+	   (do
+	     (addWorldPlayer (ref (struct player name #{})))
+	     (write conn (str "PRIVMSG " name " : Current Players: " (getWorldPlayers)))
+	     )
+	   (do
+	     (cond 
+	      (re-find #"go" message)
+	      (let [[_ locationString] (re-matches #"go (.*)" message)]
+		(if (locationExists? locationString)
+		  (do 
+		    (write conn (str "PRIVMSG " name " : Location Exists"))
+		    )
+		  (write conn (str "PRIVMSG " name " : Cannot go there"))
+		  )
+		)
+	      )
+	     )
+	 )))))))
+
  (defn login [conn user]
    (write conn (str "NICK " (:nick user)))
    (write conn (str "USER " (:nick user) " 0 * :" (:name user))))
@@ -54,4 +70,10 @@
 (def irc (connect freenode))
 (login irc user)
 (write irc "JOIN #shikagatest")
+
+(def testLocation (ref (struct location "location1" "location1 Description" #{} #{} #{})))
+(def testLocation2 (ref (struct location "location2" "location2 Description" #{} #{} #{})))
+(addWorldLocation testLocation)
+(addWorldLocation testLocation2)
+(setStartLocation testLocation)
 ;(write irc "QUIT")

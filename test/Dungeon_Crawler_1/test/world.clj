@@ -4,7 +4,17 @@
   (:use [clojure.test]))
 
 (def testLocation (ref (struct location "location1" "location1 Description" #{} #{} #{})))
-(def testPerson (ref (struct player "name" #{})))
+(def testLocation2 (ref (struct location "location2" "location2 Description" #{} #{} #{})))
+(def testPerson (ref (struct player "name" nil #{})))
+
+(defn reset []
+  (dosync
+    (setWorld (struct world #{} #{}))
+    (ref-set testLocation (struct location "location1" "location1 Description" #{} #{} #{}))
+    (ref-set testLocation2 (struct location "location2" "location2 Description" #{} #{} #{}))
+    (ref-set testPerson (struct player "name" nil #{}))
+    )
+  )
 
 (deftest basicTest
   (is (= 1 1)))
@@ -17,16 +27,56 @@
 
 (deftest testAddLocation
   (do
-    (setWorld (struct world #{} #{}))
-    (addWorldLocations testLocation)
+    (reset)
+    (addWorldLocation testLocation)
     (is (= #{testLocation} (getWorldLocations)))
     )
   )
 
 (deftest testAddPlayer
   (do
-    (setWorld (struct world #{} #{}))
+    (reset)
+    (setStartLocation testLocation)
     (addWorldPlayer testPerson)
     (is (= #{testPerson} (getWorldPlayers)))
+    (is (= testLocation ((first (getWorldPlayers)) :location)))
+    )
+  )
+
+(deftest testMovePlayer
+  (do
+    (reset)
+    (setStartLocation testLocation)
+    (addWorldPlayer testPerson)
+    (moveWorldPlayer testPerson testLocation2)
+    (is (= testLocation2 (testPerson :location)))
+    ))
+
+(deftest testGetLocationFromName
+  (do
+    (reset)
+    (addWorldLocation testLocation)
+    (addWorldLocation testLocation2)
+    (is (= testLocation (getLocationFromName "location1")))
+    (is (= testLocation2 (getLocationFromName "location2")))
+    )
+  )
+
+(deftest testPlayerExists
+  (do
+    (reset)
+    (setStartLocation testLocation)
+    (addWorldPlayer testPerson)
+    (is (= (playerInGame? "name") true))
+    (is (= (playerInGame? "name2") false))
+    )
+  )
+
+(deftest testLocationExists
+  (do
+    (reset)
+    (addWorldLocation testLocation)
+    (is (= (locationExists? "location1") true))
+    (is (= (locationExists? "location2") false))
     )
   )

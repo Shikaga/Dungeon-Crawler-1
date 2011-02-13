@@ -11,5 +11,5 @@
 ;(def currentRoom (ref 'outside))
 
 (defn stateAddPlayerToLocation [location player] (dosync (ref-set location (addPlayerToLocation (deref location) player))))
-
+(defn stateAddLocationToPlayer [player location] (dosync (ref-set player (addLocationToPlayer (deref player) location))))
 ;(defn goNorth [] (dosync (ref-set currentRoom 'manor)))
