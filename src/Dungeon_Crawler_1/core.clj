@@ -1,7 +1,7 @@
 (ns Dungeon-Crawler-1.core)
 
-(defstruct player :name :location :inventory)
-(defstruct location :name :description :exits :items)
+(defstruct player :name :inventory)
+(defstruct location :name :description :exits :items :players)
 (defstruct item :name :description)
 (defstruct inventory :name :items)
 (defstruct world :players :locations)
@@ -16,7 +16,7 @@
   (if (itemInLocation? location item) (do (update-in location [:items] #(disj % item)) true) false))
 (defn moveItemFromLocationToInventory [location inventory item] (if (removeItemFromLocation location item) (addItem inventory item) nil))
 (defn getItemFromName [items name] (first (filter #(not= (% :name) name) items)))
-
+(defn addPlayerToLocation [location player] (update-in location [:players] #(conj % player)))
 (def directions #{:north :east :west :south})
 
 (def locationMap {'manor (struct location "Manor" "You stand in a manor!" #{(struct exit :south 'outside)} #{})
