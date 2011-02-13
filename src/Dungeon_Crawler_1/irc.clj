@@ -1,6 +1,7 @@
 ;http://nakkaya.com/2010/02/10/a-simple-clojure-irc-client/
-(ns irc
+(ns Dungeon-Crawler-1.irc
   (:use [Dungeon-Crawler-1.world] :reload)
+  (:use [Dungeon-Crawler-1.core] :reload)  
   (:import (java.net Socket)
             (java.io PrintWriter InputStreamReader BufferedReader)))
 
@@ -33,15 +34,22 @@
        (re-find #"^PING" msg)
        (write conn (str "PONG "  (re-find #":.*" msg)))
        (re-find #".* PRIVMSG.*PING" msg)
-       (do 
+       (do
 	 (write conn (str "PRIVMSG #shikagatest :oh good for you!"))
 	 (write conn (str "PRIVMSG shikaga :and good for you too!"))
-       )
-       ))))
-
+	 )
+       (re-find #".* PRIVMSG.*" msg)
+       (let [[_ name _ _ message] (re-matches #":(.*)!(.*PRIVMSG )([A-Za-z0-9-]+) :(.*)" msg)]
+	 (do
+	   (addWorldPlayer (struct player name #{}))
+           (write conn (str "PRIVMSG " name " : Current Players: " (getWorldPlayers)))
+	 )
+       )))))
  (defn login [conn user]
    (write conn (str "NICK " (:nick user)))
    (write conn (str "USER " (:nick user) " 0 * :" (:name user))))
+
+(defn handleUserMessage [username message] ())
 
 (def irc (connect freenode))
 (login irc user)

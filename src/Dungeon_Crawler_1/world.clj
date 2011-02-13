@@ -12,4 +12,4 @@
 
 (defn addWorldLocations [location] (dosync (ref-set worldReference (update-in (deref worldReference) [:locations] #(conj % location)))))
 
-(defn addWorldPerson [person] (dosync (ref-set worldReference (update-in (deref worldReference) [:players] #(conj % person)))))
+(defn addWorldPlayer [person] (dosync (ref-set worldReference (update-in (deref worldReference) [:players] #(conj % person)))))

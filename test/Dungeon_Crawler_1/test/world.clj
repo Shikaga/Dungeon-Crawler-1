@@ -23,10 +23,10 @@
     )
   )
 
-(deftest testAddPerson
+(deftest testAddPlayer
   (do
     (setWorld (struct world #{} #{}))
-    (addWorldPerson testPerson)
+    (addWorldPlayer testPerson)
     (is (= #{testPerson} (getWorldPlayers)))
     )
   )
