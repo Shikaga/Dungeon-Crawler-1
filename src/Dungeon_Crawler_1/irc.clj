@@ -30,6 +30,12 @@
    )
   )
 
+(defn myContains? [sequence comparison]
+  (if (empty? sequence)
+    false
+    (if (= (first sequence) comparison) true (myContains? (rest sequence) comparison))
+    ))
+      
  (defn conn-handler [conn]
    (while 
     (nil? (:exit @conn))
@@ -64,6 +70,17 @@
 		    (write conn (str "PRIVMSG " name " : Players in your room : " (printName (map :name (map deref (getPlayersInLocation locationString))))))
 		    )
 		  (write conn (str "PRIVMSG " name " : Cannot go there"))
+		  )
+		)
+	      (re-find #"say" message)
+	      (let [[_ user userMessage] (re-matches #"say ([A-Za-z0-9-]+) (.*)" message)]
+		(do
+		  (if (= nil (getPlayerFromName user))
+		    (write conn (str "PRIVMSG " name " : nope"))
+		    (if (myContains? (map :name (map deref (getPlayersInLocation (((deref (getPlayerFromName name)) :locationKey) :name)))) ((deref (getPlayerFromName user)) :name))
+		      (write conn (str "PRIVMSG " user " : " name " says " userMessage))
+		      )
+		    )
 		  )
 		)
 	      )
