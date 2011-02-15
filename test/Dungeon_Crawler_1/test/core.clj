@@ -9,7 +9,7 @@
 (def testLocation (struct location "testName" "testDescription" #{} #{testItem1 testItem2} #{}))
 (def testLocation2 (struct location "testName2" "testDescription2" #{} #{testItem1 testItem2} #{}))
 (def testInventory (struct inventory "testInventory" #{testItem1 testItem2}))
-(def testPlayer (struct player "Jon" testLocation testInventory))
+(def testPlayer (struct player "Jon" :testLocation testInventory))
 
 (deftest addItemsTest
   (is (= #{testItem1 testItem2 testItem3} ((addItem testInventory testItem3) :items))))
@@ -24,11 +24,15 @@
   (def removedInventory (removeItemFromLocation testLocation testItem1)))
 
 (deftest addPlayerToLocationTest
-  (is (= #{} (testLocation :players)))
-  (is (= #{testPlayer} ((addPlayerToLocation testLocation testPlayer) :players)))
+  (is (= #{} (testLocation :playerKeys)))
+  (is (= #{:testPlayer} ((addPlayerToLocation testLocation :testPlayer) :playerKeys)))
   )
 
 (deftest addLocationToPlayerTest
-  (is (= testLocation (testPlayer :location)))
-  (is (= testLocation2 ((addLocationToPlayer testPlayer testLocation2) :location)))
+  (is (= :testLocation (testPlayer :locationKey)))
+  (is (= :testLocation2 ((addLocationToPlayer testPlayer :testLocation2) :locationKey)))
   )
+
+(deftest testAddExitToLocation
+  (is (= true (contains? ((addExitToLocation testLocation :testLocation2) :exits) :testLocation2))))
+

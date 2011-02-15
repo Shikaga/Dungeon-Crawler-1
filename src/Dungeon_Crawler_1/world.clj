@@ -4,7 +4,13 @@
 )
 (def lobby (struct location "lobby" "lobbyDescription" #{} #{} #{}))
 (def startLocation (ref lobby))
-(def worldReference (ref (struct world #{} #{})))
+(def worldReference (ref (struct world #{} {})))
+(def testMap
+     { 
+      :person1 (struct player "person1" :location1 #{})
+      :person2 (struct player "person2" :location2 #{})
+      :person3 (struct player "person3" :location1 #{})
+      })
 
 (defn setWorld [worldIn] (dosync (ref-set worldReference worldIn)))
 (defn setStartLocation [locationIn] (dosync (ref-set startLocation locationIn)))
@@ -12,7 +18,13 @@
 
 (defn getWorldPlayers [] (worldReference :players))
 
-(defn addWorldLocation [locationIn] (dosync (ref-set worldReference (update-in (deref worldReference) [:locations] #(conj % locationIn)))))
+(defn addWorldLocation [locationKeyIn locationIn] (dosync (ref-set worldReference (update-in (deref worldReference) [:locations] assoc locationKeyIn locationIn))))
+
+(defn getPlayersInLocation [locationIn]
+  ;(:name (deref (:locationKey (deref (first (worldReference :players))))))
+  (filter #(= ((deref ((deref %) :locationKey)) :name) locationIn) (worldReference :players))
+  ;(filter #(not= ((deref ((deref %) :locationKey)) :name) locationIn) (worldReference :players))
+  )
 
 (defn addWorldPlayer [person]
   (dosync
@@ -27,8 +39,13 @@
    )
   )
 
+(defn getPlayerFromName [playerName]
+  (first (filter #(= (% :name) playerName) (worldReference :players)))
+  )
+
 (defn getLocationFromName [locationName]
-  (first (filter #(= (% :name) locationName) (worldReference :locations)))
+  ;(vals (worldReference :locations))
+  (first (filter #(= (% :name) locationName) (vals (worldReference :locations))))
   )
 
 (defn playerInGame? [playerName]

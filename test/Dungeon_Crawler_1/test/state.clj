@@ -13,8 +13,13 @@
   (is (= 1 1)))
 
 (deftest testStateAddPlayerToLocation
-  (is (= #{testPlayer} ((stateAddPlayerToLocation testLocation testPlayer) :players)))
+  (is (= #{testPlayer} ((stateAddPlayerToLocation testLocation testPlayer) :playerKeys)))
   )
 
 (deftest testStateAddLocationToPlayer
-  (is (= testLocation2 ((stateAddLocationToPlayer (ref (struct player "player1" testLocation #{})) testLocation2) :location))))
+  (is (= testLocation2 ((stateAddLocationToPlayer (ref (struct player "player1" testLocation #{})) testLocation2) :locationKey))))
+
+(deftest testAddExitToLocation
+  (do
+    (stateAddExitToLocation testLocation2 testLocation) 
+  ))

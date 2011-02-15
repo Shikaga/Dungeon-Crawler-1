@@ -23,6 +23,13 @@
      (.println (str msg "\r"))
      (.flush)))
 
+(defn printName [sequence]
+  (if (empty? sequence)
+    ""
+    (str (first sequence) ", " (printName (rest sequence)))
+   )
+  )
+
  (defn conn-handler [conn]
    (while 
     (nil? (:exit @conn))
@@ -43,7 +50,7 @@
 	 (do
 	   (if (not (playerInGame? name))
 	   (do
-	     (addWorldPlayer (ref (struct player name #{})))
+	     (addWorldPlayer (ref (struct player name :word #{})))
 	     (write conn (str "PRIVMSG " name " : Current Players: " (getWorldPlayers)))
 	     )
 	   (do
@@ -53,13 +60,15 @@
 		(if (locationExists? locationString)
 		  (do 
 		    (write conn (str "PRIVMSG " name " : Location Exists"))
+		    (moveWorldPlayer (getPlayerFromName name) (getLocationFromName locationString))
+		    (write conn (str "PRIVMSG " name " : Players in your room : " (printName (map :name (map deref (getPlayersInLocation locationString))))))
 		    )
 		  (write conn (str "PRIVMSG " name " : Cannot go there"))
 		  )
 		)
 	      )
 	     )
-	 )))))))
+	   )))))))
 
  (defn login [conn user]
    (write conn (str "NICK " (:nick user)))
@@ -71,9 +80,12 @@
 (login irc user)
 (write irc "JOIN #shikagatest")
 
-(def testLocation (ref (struct location "location1" "location1 Description" #{} #{} #{})))
-(def testLocation2 (ref (struct location "location2" "location2 Description" #{} #{} #{})))
-(addWorldLocation testLocation)
-(addWorldLocation testLocation2)
+(def testLocation (ref (struct location "kitchen" "location1 Description" #{} #{} #{})))
+(def testLocation2 (ref (struct location "office" "location2 Description" #{} #{} #{})))
+(def testLocation3 (ref (struct location "batcave" "location2 Description" #{} #{} #{})))
+(def testLocation4 (ref (struct location "board-room" "location2 Description" #{} #{} #{})))
+
+(addWorldLocation :location1 testLocation)
+(addWorldLocation :location2 testLocation2)
 (setStartLocation testLocation)
 ;(write irc "QUIT")
